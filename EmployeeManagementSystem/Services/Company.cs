@@ -46,6 +46,53 @@ namespace EmployeeManagementSystem.Services
             return newDepartment;
         }
 
+        public void DisplayDepartments()
+        {
+            if (departments.Count == 0)
+            {
+                Console.WriteLine("No departments found. ");
+                return;
+            }
+
+            foreach(KeyValuePair<int, Department> item in departments)
+            {
+                Console.WriteLine(item.Value);
+            }
+        }
+
+        private Department GetDepartmentById(int departmentId)
+        {
+            if (!departments.TryGetValue(departmentId, out Department? department))
+            {
+                throw new InvalidOperationException("Department not found. ");
+            }
+            return department;
+        }
+
+        public Employee AddEmployee(string name, int departmentId, decimal salary, bool isManager)
+        {
+            GetDepartmentById(departmentId);
+
+            Employee employee;
+
+            if (isManager)
+            {
+                employee = new Manager(nextEmployeeId++, name, departmentId, salary);
+            }
+            else 
+            {
+                employee = new Employee(nextEmployeeId++, name, departmentId, salary);
+            }
+            employees.Add(employee);
+
+            onboardingQueue.Enqueue(employee);
+
+            actionHistory.Push($"Added employee: {employee.Name}");
+
+            return employee;
+        }
+        
+
 
     }
 }
