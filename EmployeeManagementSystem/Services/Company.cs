@@ -165,6 +165,123 @@ namespace EmployeeManagementSystem.Services
             }
         }
 
+        public void SearchEmployees (string searchValue)
+        {
+            if (string.IsNullOrWhiteSpace(searchValue))
+                throw new ArgumentException("Saerch value is required");
+
+            //bool found = false; 
+
+            //if (int.TryParse(searchValue, out int id))
+            //{
+            //    foreach(Employee employee in employees)
+            //    {
+            //        if ( employee.Id == id)
+            //        {
+            //            Console.WriteLine(employee.GetInfo());
+            //            found = true;
+            //        }
+            //    }
+            //}
+            //else
+            //{
+            //    foreach (Employee employee in employees)
+            //    {
+            //        if (employee.Name.Contains(searchValue, StringComparison.OrdinalIgnoreCase))
+            //        {
+            //            Console.WriteLine(employee.GetInfo());  
+            //            found = true;
+            //        }
+            //    }
+            //}
+            //if (! found)
+            //{
+            //    Console.WriteLine("No employees found");
+            //}
+
+            if (int.TryParse(searchValue, out int id))
+            {
+                foreach(Employee employee in employees)
+                {
+                    if (employee.Id == id)
+                    {
+                        Console.WriteLine(employee.GetInfo());
+                        return;
+                    }
+                }
+
+                Console.WriteLine("No employees found");
+            }
+        }
+
+        public void DisplayEmployeesByDepartment(int departmentId)
+        {
+            Department department = GetDepartmentById(departmentId);    
+
+            List<Employee> departmentEmployees = new List<Employee>();
+
+            foreach (Employee employee in employees)
+            {
+                if (employee.DepartmentId == departmentId)
+                {
+                    departmentEmployees.Add(employee);
+                }
+            }
+
+            Console.WriteLine($"Department : {department.Name}");
+
+            if (departmentEmployees.Count == 0)
+            {
+                Console.WriteLine("This department has no employees. ");
+                return;
+            }
+
+            foreach(Employee employee in departmentEmployees)
+            {
+                Console.WriteLine(employee.GetInfo());  
+            }
+        }
+
+        public void DisplayDepartmentSalaryAverages()
+        {
+            Dictionary<int, List<Employee>> departmentGroups = new Dictionary<int, List<Employee>>();
+
+            foreach (Employee employee in employees)
+            {
+                if (!departmentGroups.ContainsKey(employee.DepartmentId))
+                {
+                    departmentGroups.Add(employee.DepartmentId, new List<Employee>());
+                }
+                departmentGroups[employee.DepartmentId].Add(employee);
+            }
+
+            if(departmentGroups.Count == 0)
+            {
+                Console.WriteLine("No salary data found");
+                return;
+            }
+
+            foreach (KeyValuePair<int, List<Employee>> group in departmentGroups)
+            {
+                int departmentId = group.Key;
+                List<Employee> departmentEmployees = group.Value;
+
+                decimal totalSalary = 0;
+
+                foreach(Employee employee in departmentEmployees)
+                {
+                    totalSalary  += employee.Salary;
+                }
+
+                decimal averageSalary = totalSalary / departmentEmployees.Count;
+
+                Department department = GetDepartmentById(departmentId);
+
+                Console.WriteLine($"{department.Name}: Average Salary = {averageSalary:F2}");
+            }
+        }
+
+
 
 
 
