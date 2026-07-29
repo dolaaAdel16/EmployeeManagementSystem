@@ -91,7 +91,22 @@ namespace EmployeeManagementSystem.Services
 
             return employee;
         }
+
+        public void ProcessNextOnboarding()
+        {
+            if (onboardingQueue.Count == 0)
+            {
+                Console.WriteLine("There are no employees eaiting for onboarding. ");
+                return;
+            }
+            Employee employee = onboardingQueue.Dequeue();
+
+            Console.WriteLine($"Onboarding completed for: {employee.Name}");
+
+            actionHistory.Push($"Completed onboarding for: {employee.Name}");
+        }
         
+
 
 
     }
