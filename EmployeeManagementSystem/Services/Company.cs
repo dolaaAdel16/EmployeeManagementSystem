@@ -17,7 +17,7 @@ namespace EmployeeManagementSystem.Services
         
         private Stack<string> actionHistory = new Stack<string>();  
 
-        private HashSet<string> companySklls = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+        private HashSet<string> companySkills = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
 
         private int nextEmployeeId = 1;
         private int nextDepartmentId = 1;
@@ -69,6 +69,19 @@ namespace EmployeeManagementSystem.Services
             return department;
         }
 
+        private Employee GetEmployeeById(int id)
+        {
+            foreach (Employee employee in employees)
+            {
+                if (employee.Id == id)
+                {
+                    return employee;
+                }
+            }
+
+            throw new Exception("Employee not found.");
+        }
+
         public Employee AddEmployee(string name, int departmentId, decimal salary, bool isManager)
         {
             GetDepartmentById(departmentId);
@@ -106,6 +119,52 @@ namespace EmployeeManagementSystem.Services
             actionHistory.Push($"Completed onboarding for: {employee.Name}");
         }
         
+        public void  DisplayOnboardingQueue()
+        {
+            if (onboardingQueue.Count == 0)
+            {
+                Console.WriteLine("Onboarding queue is empty.");
+                return;
+            }
+
+            foreach (Employee employee in onboardingQueue)
+            {
+                Console.WriteLine(employee.GetInfo());
+            }
+        }
+
+        public void AddSkillToEmployee(int employeeId, string skill)
+        {
+            if (string.IsNullOrWhiteSpace(skill))
+                throw new ArgumentException("Skill is required");
+
+            Employee employee = GetEmployeeById(employeeId);
+
+            bool addedToEmployee = employee.Skills.Add(skill);
+            if(!addedToEmployee)
+            {
+                Console.WriteLine("This employee already has that skill.");
+                return;
+            }
+
+            companySkills.Add(skill);
+
+            actionHistory.Push($"Added skill{skill} to {employee.Name}");
+        }
+
+        public void DisplayCompanySkills()
+        {
+            if (companySkills.Count == 0)
+            {
+                Console.WriteLine("No company skills found");
+                return;
+            }
+            foreach (string skill in companySkills)
+            {
+                Console.WriteLine($"- {skill}");
+            }
+        }
+
 
 
 
