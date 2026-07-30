@@ -281,8 +281,146 @@ namespace EmployeeManagementSystem.Services
             }
         }
 
+        public void DisplayDepartmentEmployeeCounts()
+        {
+            if (employees.Count == 0)
+            {
+                Console.WriteLine("No employees found");
+                return;
+            }
 
+            Dictionary<int, int> employeeCounts = new Dictionary<int, int>();
 
+            foreach (Employee employee in employees)
+            {
+                int departmentId = employee.DepartmentId;
+
+                if(employeeCounts.ContainsKey(departmentId))
+                {
+                    employeeCounts[departmentId]++;
+                }
+                else
+                {
+                    employeeCounts.Add(departmentId, 1);
+                }
+            }
+
+            foreach (KeyValuePair<int, int> item in employeeCounts)
+            {
+                Department department = GetDepartmentById((int)item.Key);
+                Console.WriteLine($"{department.Name}: {item.Value} employee(s)");
+            }
+        }
+
+        public void DisplayActionHistory()
+        {
+            if (actionHistory.Count == 0)
+            {
+                Console.WriteLine("Action history is empty");
+                return;
+            }
+            foreach (string action in actionHistory)
+            {
+                Console.WriteLine(action);
+            }
+        }
+
+        public void UndoLastAction()
+        {
+            if (actionHistory.Count == 0)
+            {
+                Console.WriteLine("There is no action to undo.");
+                return;
+            }
+
+            string lastAction = actionHistory.Pop();
+
+            Console.WriteLine(
+                $"Removed last action from history: {lastAction}"
+            );
+        }
+
+        public void AssignEmployeeToManager(
+    int managerId,
+    int employeeId)
+        {
+            Employee managerEmployee =
+                GetEmployeeById(managerId);
+
+            if (managerEmployee is not Manager manager)
+            {
+                throw new InvalidOperationException(
+                    "The selected employee is not a manager."
+                );
+            }
+
+            Employee teamMember =
+                GetEmployeeById(employeeId);
+
+            if (manager.Id == teamMember.Id)
+            {
+                throw new InvalidOperationException(
+                    "A manager cannot manage themselves."
+                );
+            }
+
+            manager.AddTeamMember(teamMember);
+
+            actionHistory.Push(
+                $"Assigned {teamMember.Name} to manager {manager.Name}"
+            );
+        }
+
+        public void SeedData()
+        {
+            Department development =
+                AddDepartment("Development");
+
+            Department hr =
+                AddDepartment("Human Resources");
+
+            Department finance =
+                AddDepartment("Finance");
+
+            Employee manager = AddEmployee(
+                "Ahmed",
+                development.Id,
+                18000,
+                true
+            );
+
+            Employee employee1 = AddEmployee(
+                "Sara",
+                development.Id,
+                10000,
+                false
+            );
+
+            Employee employee2 = AddEmployee(
+                "Mona",
+                hr.Id,
+                9000,
+                false
+            );
+
+            Employee employee3 = AddEmployee(
+                "Omar",
+                finance.Id,
+                11000,
+                false
+            );
+
+            AddSkillToEmployee(manager.Id, "Leadership");
+            AddSkillToEmployee(manager.Id, "C#");
+            AddSkillToEmployee(employee1.Id, "C#");
+            AddSkillToEmployee(employee1.Id, "SQL");
+            AddSkillToEmployee(employee2.Id, "Recruitment");
+
+            AssignEmployeeToManager(
+                manager.Id,
+                employee1.Id
+            );
+        }
 
 
     }
